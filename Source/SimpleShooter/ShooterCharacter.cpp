@@ -31,14 +31,22 @@ void AShooterCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
+	PlayerInputComponent->BindAction(TEXT("Jump"), EInputEvent::IE_Pressed, this, &ACharacter::Jump);
+
 	PlayerInputComponent->BindAxis(TEXT("MoveForward"), this, &AShooterCharacter::MoveForward);
 	PlayerInputComponent->BindAxis(TEXT("MoveRight"), this, &AShooterCharacter::MoveRight);
+
+
+#pragma region Turn Camera For Mouse
 	PlayerInputComponent->BindAxis(TEXT("LookUp"), this, &APawn::AddControllerPitchInput);
 	PlayerInputComponent->BindAxis(TEXT("LookRight"), this, &APawn::AddControllerYawInput);
-	PlayerInputComponent->BindAction(TEXT("Jump"), EInputEvent::IE_Pressed, this, &ACharacter::Jump);
-	//다른 버전
-	//PlayerInputComponent->BindAxis(TEXT("LookUp", this, AShooterCharacter::LookUp));
+#pragma endregion
 
+
+#pragma region Turn Camera For GamePad
+	PlayerInputComponent->BindAxis(TEXT("LookUpRate"), this, &AShooterCharacter::LookUpRate);
+	PlayerInputComponent->BindAxis(TEXT("LookRightRate"), this, &AShooterCharacter::LookRightRate);
+#pragma endregion
 }
 
 void AShooterCharacter::MoveForward(float AxisValue)
@@ -48,6 +56,14 @@ void AShooterCharacter::MoveForward(float AxisValue)
 void AShooterCharacter::MoveRight(float AxisValue)
 {
 	AddMovementInput(GetActorRightVector() * AxisValue);
+}
+void AShooterCharacter::LookUpRate(float AxisValue)
+{
+	AddControllerPitchInput(AxisValue * RotationRate * GetWorld()->GetDeltaSeconds());
+}
+void AShooterCharacter::LookRightRate(float AxisValue)
+{
+	AddControllerYawInput(AxisValue * RotationRate * GetWorld()->GetDeltaSeconds());
 }
 /*
 void AShooterCharacter::LookUp(float AxisValue)
