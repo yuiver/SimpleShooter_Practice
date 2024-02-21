@@ -4,6 +4,7 @@
 #include "ShooterCharacter.h"
 #include "Components/InputComponent.h"
 #include "Gun.h"
+#include "BhapticsSDK2.h"
 
 // Sets default values
 AShooterCharacter::AShooterCharacter()
@@ -17,6 +18,8 @@ AShooterCharacter::AShooterCharacter()
 void AShooterCharacter::BeginPlay()
 {
 	Super::BeginPlay();
+
+	Health = MaxHealth;
 	
 	Gun = GetWorld()->SpawnActor<AGun>(GunClass);
 	GetMesh()->HideBoneByName(TEXT("weapon_r"), EPhysBodyOp::PBO_None);
@@ -37,7 +40,6 @@ void AShooterCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
 	PlayerInputComponent->BindAction(TEXT("Jump"), EInputEvent::IE_Pressed, this, &ACharacter::Jump);
-
 	PlayerInputComponent->BindAxis(TEXT("MoveForward"), this, &AShooterCharacter::MoveForward);
 	PlayerInputComponent->BindAxis(TEXT("MoveRight"), this, &AShooterCharacter::MoveRight);
 	PlayerInputComponent->BindAction(TEXT("Shoot"), EInputEvent::IE_Pressed, this, &AShooterCharacter::Shoot);
@@ -53,6 +55,16 @@ void AShooterCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 	PlayerInputComponent->BindAxis(TEXT("LookUpRate"), this, &AShooterCharacter::LookUpRate);
 	PlayerInputComponent->BindAxis(TEXT("LookRightRate"), this, &AShooterCharacter::LookRightRate);
 #pragma endregion
+}
+
+float AShooterCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
+{
+	float DamegeToApply = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+	DamegeToApply = FMath::Min(Health, DamegeToApply);
+	Health -= DamegeToApply;
+	UE_LOG(LogTemp, Warning, TEXT("HP left : %f"), Health);
+
+	return DamegeToApply;
 }
 
 void AShooterCharacter::MoveForward(float AxisValue)
@@ -73,6 +85,7 @@ void AShooterCharacter::LookRightRate(float AxisValue)
 }
 void AShooterCharacter::Shoot()
 {
+	UBhapticsSDK2::PlayHaptic("shoot");
 	Gun->PullTrigger();
 }
 /*
