@@ -11,6 +11,8 @@
 void AShooterAIController::Tick(float DeltaTime)
 {	
 	Super::Tick(DeltaTime);
+
+	/* Behavior Service를 적용으로 주석으로 바꿈
 	float DistanceToPlayer = FVector::Distance(AIPawn->GetActorLocation(), PlayerPawn->GetActorLocation());
 	if (PlayerPawn && LineOfSightTo(PlayerPawn) && DistanceToPlayer < MaxChaseDistance)
 	{
@@ -21,9 +23,10 @@ void AShooterAIController::Tick(float DeltaTime)
 	{
 		GetBlackboardComponent()->ClearValue(TEXT("PlayerLocation"));
 	}
+	*/
 
 
-	/* Behavior Tree 적용 테스트를 위해 주석화
+	/* Behavior Tree 적용으로 주석으로 바꿈
 	if (AIPawn && PlayerPawn)
 	{
 		if (!AIPawn->IsDead())
@@ -65,6 +68,11 @@ void AShooterAIController::BeginPlay()
 	PlayerPawn = UGameplayStatics::GetPlayerPawn(GetWorld(), 0);
 	AIPawn = Cast<AShooterCharacter>(GetPawn());
 
+	StartBehaviorTree();
+}
+
+void AShooterAIController::StartBehaviorTree()
+{
 	if (AIBehavior)
 	{
 		RunBehaviorTree(AIBehavior);
@@ -72,12 +80,16 @@ void AShooterAIController::BeginPlay()
 	}
 }
 
+
+
 //Tick에서 플레이어를 추적해야하는 거리인지 체크하는 로직
 bool AShooterAIController::IsPlayerInRange()
 {
 	float DistanceToPlayer = FVector::Distance(AIPawn->GetActorLocation(), PlayerPawn->GetActorLocation());
 	return DistanceToPlayer <= MaxChaseDistance; // MaxChaseDistance는 AI가 플레이어를 추적할 최대 거리
 }
+
+
 
 //Tick에서 플레이어를 추적해야하는지 시간과 이동거리로 체크하는 로직
 bool AShooterAIController::NeedToUpdatePath(float DistanceToPlayer)

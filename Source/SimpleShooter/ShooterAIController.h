@@ -16,6 +16,7 @@ class SIMPLESHOOTER_API AShooterAIController : public AAIController
 public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+	void StartBehaviorTree();
 
 protected:
 
