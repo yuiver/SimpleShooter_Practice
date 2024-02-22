@@ -4,7 +4,9 @@
 #include "ShooterCharacter.h"
 #include "Components/InputComponent.h"
 #include "Gun.h"
+#include "Components/CapsuleComponent.h"
 #include "BhapticsSDK2.h"
+#include "SimpleShooterGameModeBase.h"
 
 // Sets default values
 AShooterCharacter::AShooterCharacter()
@@ -68,6 +70,17 @@ float AShooterCharacter::TakeDamage(float DamageAmount, FDamageEvent const& Dama
 	DamegeToApply = FMath::Min(Health, DamegeToApply);
 	Health -= DamegeToApply;
 	UE_LOG(LogTemp, Warning, TEXT("HP left : %f"), Health);
+
+	if (IsDead())
+	{
+		ASimpleShooterGameModeBase* GameMode = GetWorld()->GetAuthGameMode<ASimpleShooterGameModeBase>();
+		GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		if (GameMode != nullptr)
+		{
+			GameMode->PawnKilled(this);
+		}
+		DetachFromControllerPendingDestroy();
+	}
 
 	return DamegeToApply;
 }
