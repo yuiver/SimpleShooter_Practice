@@ -17,6 +17,7 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 	void StartBehaviorTree();
+	bool IsDead() const;
 
 protected:
 
@@ -24,6 +25,17 @@ protected:
 
 private:
 
+
+	bool NeedToUpdatePath(float DistanceToPlayer);
+
+	UPROPERTY(editAnywhere)
+	class UBehaviorTree* AIBehavior;
+
+	APawn* PlayerPawn;
+	class AShooterCharacter* AIPawn;
+
+
+#pragma region RecagyPrivate
 	enum class EAIState
 	{
 		Idle,
@@ -32,21 +44,17 @@ private:
 		Dead
 	};
 
-	bool NeedToUpdatePath(float DistanceToPlayer);
 
-	APawn* PlayerPawn;
-	class AShooterCharacter* AIPawn;
 	bool IsPlayerInRange();
+	EAIState CurrentState = EAIState::Idle;
+	FVector LastKnownPlayerLocation;
 	float MaxChaseDistance = 600;
 	float AcceptanceRadius = 200;
-	EAIState CurrentState = EAIState::Idle;
-
 	float LastPathUpdateTime = 0.0f;
 	float PathUpdateInterval = 1.0f; // 경로를 갱신할 시간 간격 (초 단위)
 	float RequiredDistanceChange = 100.0f; // 경로를 갱신하기 위한 필요한 최소 거리 변화
-	FVector LastKnownPlayerLocation;
 
-	UPROPERTY(editAnywhere)
-	class UBehaviorTree* AIBehavior;
+#pragma endregion
+
 };
 
