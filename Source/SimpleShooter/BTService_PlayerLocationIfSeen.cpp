@@ -51,7 +51,7 @@ void UBTService_PlayerLocationIfSeen::TickNode(UBehaviorTreeComponent& OwnerComp
     if (AIController->LineOfSightTo(PlayerPawn))
     {
         // 시야선이 있다면, 플레이어의 위치를 블랙보드에 업데이트
-        OwnerComp.GetBlackboardComponent()->SetValueAsVector(GetSelectedBlackboardKey(), PlayerPawn->GetActorLocation());
+        OwnerComp.GetBlackboardComponent()->SetValueAsObject(GetSelectedBlackboardKey(), PlayerPawn);
     }
     else
     {
