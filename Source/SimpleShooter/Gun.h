@@ -39,6 +39,12 @@ private:
 	UParticleSystem* HitParticle;
 
 	UPROPERTY(EditAnywhere)
+	USoundBase* MuzzleFlashSound;
+
+	UPROPERTY(EditAnywhere)
+	USoundBase* HitSound;
+
+	UPROPERTY(EditAnywhere)
 	float MaxRange = 10000;
 
 	UPROPERTY(EditAnywhere)

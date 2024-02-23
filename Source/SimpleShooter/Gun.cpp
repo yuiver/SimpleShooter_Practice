@@ -22,7 +22,9 @@ AGun::AGun()
 
 void AGun::PullTrigger()
 {
+	//√—±∏ ¿Ã∆Â∆Æ
 	UGameplayStatics::SpawnEmitterAttached(MuzzleFlash, Mesh, TEXT("MuzzleFlashSocket"));
+	UGameplayStatics::SpawnSoundAttached(MuzzleFlashSound, Mesh, TEXT("MuzzleFlashSocket"));
 
 	FHitResult Hit;
 	FVector ShotDirection;
@@ -30,7 +32,9 @@ void AGun::PullTrigger()
 
 	if (bSuccess)
 	{
+		//√—æÀ ∏¬√ﬂ¥¬ ¿Ã∆Â∆Æ
 		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), HitParticle, Hit.Location, ShotDirection.Rotation());
+		UGameplayStatics::SpawnSoundAtLocation(GetWorld(), HitSound, Hit.Location, ShotDirection.Rotation()); //πÊ«‚¿∫ ª©µµ µ»¥Ÿ∞Ì «‘
 
 		AActor* HitActor = Hit.GetActor();
 		if (HitActor != nullptr)
