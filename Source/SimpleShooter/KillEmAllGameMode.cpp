@@ -2,6 +2,9 @@
 
 
 #include "KillEmAllGameMode.h"
+#include "EngineUtils.h"
+#include "GameFramework/Controller.h"
+#include "ShooterAIController.h"
 
 void AKillEmAllGameMode::PawnKilled(APawn* PawnKilled)
 {
@@ -13,7 +16,27 @@ void AKillEmAllGameMode::PawnKilled(APawn* PawnKilled)
 	APlayerController* PlayerController = Cast<APlayerController>(PawnKilled->GetController());
 	if (PlayerController != nullptr)
 	{
-		PlayerController->GameHasEnded(nullptr, false);
+		EndGame(false);
 	}
 
+	for (AShooterAIController* Controller : TActorRange<AShooterAIController>(GetWorld()))
+	{
+		if (!Controller->IsDead())
+		{
+			return;
+		}
+	}
+
+	EndGame(true);
+
+}
+
+void AKillEmAllGameMode::EndGame(bool bIsPlayerWinner)
+{
+	for (AController* Controller : TActorRange<AController>(GetWorld()))
+	{
+		bool bIsWinner = Controller->IsPlayerController() == bIsPlayerWinner;
+		//포트나이트 시나리오 에서는 Controller->GetPawn()대신 죽인 주체를 넣어서 카메라를 죽인 상대에게 고정시킴
+		Controller->GameHasEnded(Controller->GetPawn(), bIsWinner);
+	}
 }

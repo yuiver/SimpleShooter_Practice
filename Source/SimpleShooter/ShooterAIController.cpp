@@ -12,6 +12,9 @@ void AShooterAIController::Tick(float DeltaTime)
 {	
 	Super::Tick(DeltaTime);
 
+#pragma region RegacyTick
+
+
 	/* Behavior Service를 적용으로 주석으로 바꿈
 	float DistanceToPlayer = FVector::Distance(AIPawn->GetActorLocation(), PlayerPawn->GetActorLocation());
 	if (PlayerPawn && LineOfSightTo(PlayerPawn) && DistanceToPlayer < MaxChaseDistance)
@@ -59,6 +62,8 @@ void AShooterAIController::Tick(float DeltaTime)
 		}
 	}
 	*/
+#pragma endregion
+
 }
 
 void AShooterAIController::BeginPlay()
@@ -80,7 +85,18 @@ void AShooterAIController::StartBehaviorTree()
 	}
 }
 
+bool AShooterAIController::IsDead() const
+{
+	AShooterCharacter* ControlledCharacter = Cast<AShooterCharacter>(GetPawn());
+	if (ControlledCharacter != nullptr)
+	{
+		return ControlledCharacter->IsDead();
+	}
 
+	return true;
+}
+
+#pragma region Regacy
 
 //Tick에서 플레이어를 추적해야하는 거리인지 체크하는 로직
 bool AShooterAIController::IsPlayerInRange()
@@ -109,4 +125,7 @@ bool AShooterAIController::NeedToUpdatePath(float DistanceToPlayer)
 	}
 	// 여기서 이동 경로를 갱신해야 할지 결정하는 로직 구현
 	return false;
+
+#pragma endregion
+
 }

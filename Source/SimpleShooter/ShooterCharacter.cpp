@@ -7,13 +7,13 @@
 #include "Components/CapsuleComponent.h"
 #include "BhapticsSDK2.h"
 #include "SimpleShooterGameModeBase.h"
+//#include "EnhancedInputComponent.h"
 
 // Sets default values
 AShooterCharacter::AShooterCharacter()
 {
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-
 }
 
 // Called when the game starts or when spawned
@@ -34,6 +34,11 @@ bool AShooterCharacter::IsDead() const
 	return Health <= 0;
 }
 
+float AShooterCharacter::GetHealthPercent() const
+{
+	return Health / MaxHealth;
+}
+
 // Called every frame
 void AShooterCharacter::Tick(float DeltaTime)
 {
@@ -46,10 +51,14 @@ void AShooterCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
+	//UEnhancedInputComponent* Input = Cast<UEnhancedInputComponent>(PlayerInputComponent);
+	// 여기에서 'ETriggerEvent' 열거형 값을 변경하여 원하는 트리거 이벤트를 바인딩할 수 있습니다.
+	//Input->BindAction(AimingInputAction, ETriggerEvent::Triggered, this, &AFooBar::SomeCallbackFunc);
+
 	PlayerInputComponent->BindAction(TEXT("Jump"), EInputEvent::IE_Pressed, this, &ACharacter::Jump);
 	PlayerInputComponent->BindAxis(TEXT("MoveForward"), this, &AShooterCharacter::MoveForward);
 	PlayerInputComponent->BindAxis(TEXT("MoveRight"), this, &AShooterCharacter::MoveRight);
-	PlayerInputComponent->BindAction(TEXT("Shoot"), EInputEvent::IE_Pressed, this, &AShooterCharacter::Shoot);
+	PlayerInputComponent->BindAction(TEXT("Shoot"), EInputEvent::IE_Pressed, this, &AShooterCharacter::PlayerShoot);
 
 
 #pragma region Turn Camera For Mouse
@@ -67,9 +76,18 @@ void AShooterCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 float AShooterCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
 	float DamegeToApply = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+
 	DamegeToApply = FMath::Min(Health, DamegeToApply);
 	Health -= DamegeToApply;
-	UE_LOG(LogTemp, Warning, TEXT("HP left : %f"), Health);
+	//UE_LOG(LogTemp, Warning, TEXT("HP left : %f"), Health);
+
+	// 현재 캐릭터가 플레이어에 의해 제어되는지 확인
+	APlayerController* PlayerController = Cast<APlayerController>(GetController());
+	if (PlayerController)
+	{
+		// 플레이어가 피격당했다면, 여기에 특정 로직을 실행
+		UE_LOG(LogTemp, Warning, TEXT("Player took damage: %f"), DamageAmount);
+	}
 
 	if (IsDead())
 	{
@@ -102,6 +120,10 @@ void AShooterCharacter::LookRightRate(float AxisValue)
 	AddControllerYawInput(AxisValue * RotationRate * GetWorld()->GetDeltaSeconds());
 }
 void AShooterCharacter::Shoot()
+{
+	Gun->PullTrigger();
+}
+void AShooterCharacter::PlayerShoot()
 {
 	UBhapticsSDK2::PlayHaptic("shoot");
 	Gun->PullTrigger();

@@ -39,8 +39,20 @@ private:
 	UParticleSystem* HitParticle;
 
 	UPROPERTY(EditAnywhere)
+	USoundBase* MuzzleFlashSound;
+
+	UPROPERTY(EditAnywhere)
+	USoundBase* HitSound;
+
+	UPROPERTY(EditAnywhere)
 	float MaxRange = 10000;
 
 	UPROPERTY(EditAnywhere)
-	float Damage = 10;
+	float Damage = 50;
+
+	AController* GetOwnerController() const;
+
+	bool GunTrace(FHitResult& Hit, FVector& ShotDirection);
+
+	void PlayerHapticOnHit(APawn* HitPawn ,FVector HitPoint);
 };
