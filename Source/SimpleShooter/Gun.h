@@ -50,7 +50,9 @@ private:
 	UPROPERTY(EditAnywhere)
 	float Damage = 50;
 
+	AController* GetOwnerController() const;
+
 	bool GunTrace(FHitResult& Hit, FVector& ShotDirection);
 
-	AController* GetOwnerController() const;
+	void PlayerHapticOnHit(APawn* HitPawn ,FVector HitPoint);
 };

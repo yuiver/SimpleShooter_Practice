@@ -29,6 +29,7 @@ public:
 	float GetHealthPercent() const;
 
 	void Shoot();
+	void PlayerShoot();
 
 
 	// Called every frame

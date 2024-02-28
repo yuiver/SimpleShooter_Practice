@@ -9,6 +9,7 @@
 void AShooterPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
+	bShowMouseCursor = false;
 	HUD = CreateWidget(this, HUDClass);
 	if (HUD != nullptr)
 	{
@@ -43,5 +44,6 @@ void AShooterPlayerController::GameHasEnded(class AActor* EndGameFocus, bool bIs
 		}
 
 	}
-		GetWorldTimerManager().SetTimer(TimerHandle, this, &APlayerController::RestartLevel, RestartDelay);
+	bShowMouseCursor = true;
+		//GetWorldTimerManager().SetTimer(TimerHandle, this, &APlayerController::RestartLevel, RestartDelay);
 }

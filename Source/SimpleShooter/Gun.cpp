@@ -7,6 +7,8 @@
 #include "Kismet/GameplayStatics.h"
 #include "DrawDebugHelpers.h"
 #include "Engine/DamageEvents.h"
+#include "BhapticsSDK2.h"
+
 
 // Sets default values
 AGun::AGun()
@@ -42,6 +44,19 @@ void AGun::PullTrigger()
 			FPointDamageEvent PointDamageEvent(Damage, Hit, ShotDirection, nullptr);
 			AController* OwnerController = GetOwnerController();
 			HitActor->TakeDamage(Damage, PointDamageEvent, OwnerController, this);
+
+			//플레이어 체크 로직
+			APawn* HitPawn = Cast<APawn>(HitActor);
+			if (HitPawn)
+			{
+				AController* HitController = HitPawn->GetController();
+				APlayerController* PlayerController = Cast<APlayerController>(HitController);
+				if (PlayerController)
+				{	
+					//플레이어가 맞다면 햅틱을 울린다.
+					PlayerHapticOnHit(HitPawn ,Hit.Location);
+				}
+			}
 		}
 	}
 }
@@ -82,6 +97,42 @@ bool AGun::GunTrace(FHitResult& Hit, FVector& ShotDirection)
 
 	return GetWorld()->LineTraceSingleByChannel(Hit, Location, End, ECollisionChannel::ECC_GameTraceChannel1, Params);
 
+}
+
+void AGun::PlayerHapticOnHit(APawn* HitPawn , FVector HitPoint)
+{
+	// 플레이어로부터 피격 위치까지의 방향 벡터를 계산합니다.
+	FVector HitDirection = HitPoint - HitPawn->GetActorLocation();
+	HitDirection.Normalize(); // 정규화
+	//FVector DirectionVector = (HitPoint - HitPawn->GetActorLocation()).GetSafeNormal();
+
+
+	// 플레이어의 전방 벡터를 얻습니다.
+	FVector ForwardVector = HitPawn->GetActorForwardVector();
+
+
+	// 두 벡터 사이의 각도를 계산합니다. 결과는 라디안 단위입니다.
+	float DotProduct = FVector::DotProduct(ForwardVector, HitDirection);
+	float AngleRadians = acos(DotProduct); // acos는 라디안 값을 반환합니다.
+
+
+	// 라디안을 도(degree)로 변환합니다.
+	float AngleDegrees = FMath::RadiansToDegrees(AngleRadians);
+
+
+	// 피격 위치가 플레이어의 왼쪽 또는 오른쪽인지 결정합니다.
+	FVector CrossProduct = FVector::CrossProduct(ForwardVector, HitDirection);
+	UE_LOG(LogTemp, Warning, TEXT("CrossProduct : %s"), *CrossProduct.ToString());
+	if (CrossProduct.Z < 0)
+	{
+		AngleDegrees = 360 - AngleDegrees; // 오른쪽의 각도를 양의 값으로 조정
+	}
+	// 반시계 방향으로 변환
+	float CounterClockwiseAngle = 360.0f - AngleDegrees;
+
+	// 그 결과로 햅틱을 울린다.
+	UE_LOG(LogTemp, Warning, TEXT("Hit angle: %f degrees"), AngleDegrees);
+	UBhapticsSDK2::PlayHapticWithOption("hit", 1.0f, 1.0f, CounterClockwiseAngle, HitDirection.Z);
 }
 
 AController* AGun::GetOwnerController() const
