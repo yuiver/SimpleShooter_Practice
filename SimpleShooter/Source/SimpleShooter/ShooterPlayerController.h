@@ -30,6 +30,8 @@ private:
 	TSubclassOf<class UUserWidget> LoseScreenClass;
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<class UUserWidget> HUDClass;
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<class UUserWidget> FPSClass;
 
 	UPROPERTY(EditAnywhere)
 	float RestartDelay = 5.0f;
@@ -38,4 +40,7 @@ private:
 
 	UPROPERTY()
 	UUserWidget* HUD;
+
+	UPROPERTY()
+	UUserWidget* FPS;
 };

@@ -11,9 +11,15 @@ void AShooterPlayerController::BeginPlay()
 	Super::BeginPlay();
 	bShowMouseCursor = false;
 	HUD = CreateWidget(this, HUDClass);
+	FPS = CreateWidget(this, FPSClass);
+	
 	if (HUD != nullptr)
 	{
 		HUD->AddToViewport();
+	}
+	if (HUD != nullptr)
+	{
+		FPS->AddToViewport();
 	}
 
 }
