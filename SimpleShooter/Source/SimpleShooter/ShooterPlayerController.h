@@ -20,6 +20,7 @@ protected:
 	
 protected:
 	virtual void GameHasEnded(class AActor* EndGameFocus = nullptr, bool bIsWinner = false) override;
+	virtual void SetupInputComponent() override;
 
 private:
 
@@ -32,6 +33,8 @@ private:
 	TSubclassOf<class UUserWidget> HUDClass;
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<class UUserWidget> FPSClass;
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<class UUserWidget> SettingClass;
 
 	UPROPERTY(EditAnywhere)
 	float RestartDelay = 5.0f;
@@ -43,4 +46,9 @@ private:
 
 	UPROPERTY()
 	UUserWidget* FPS;
+
+	UPROPERTY()
+	UUserWidget* SettingWidgetInstance;
+
+	void ToggleSettings();
 };

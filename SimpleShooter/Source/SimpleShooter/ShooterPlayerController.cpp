@@ -53,3 +53,29 @@ void AShooterPlayerController::GameHasEnded(class AActor* EndGameFocus, bool bIs
 	bShowMouseCursor = true;
 		//GetWorldTimerManager().SetTimer(TimerHandle, this, &APlayerController::RestartLevel, RestartDelay);
 }
+
+void AShooterPlayerController::SetupInputComponent()
+{
+	Super::SetupInputComponent();
+
+	InputComponent->BindAction("ToggleSettings", IE_Released, this, &AShooterPlayerController::ToggleSettings);
+}
+
+void AShooterPlayerController::ToggleSettings()
+{
+	if (SettingWidgetInstance == nullptr)
+	{
+		// 설정 창 위젯이 아직 표시되지 않았다면 생성하고 표시
+		SettingWidgetInstance = CreateWidget<UUserWidget>(this, SettingClass);
+		if (SettingWidgetInstance != nullptr)
+		{
+			SettingWidgetInstance->AddToViewport();
+		}
+	}
+	else
+	{
+		// 이미 표시되었다면 제거
+		SettingWidgetInstance->RemoveFromViewport();
+		SettingWidgetInstance = nullptr;
+	}
+}
