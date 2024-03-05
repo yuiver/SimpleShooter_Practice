@@ -102,27 +102,21 @@ bool AGun::GunTrace(FHitResult& Hit, FVector& ShotDirection)
 void AGun::PlayerHapticOnHit(APawn* HitPawn , FVector HitPoint)
 {
 	// 플레이어로부터 피격 위치까지의 방향 벡터를 계산합니다.
-	FVector HitDirection = HitPoint - HitPawn->GetActorLocation();
-	HitDirection.Normalize(); // 정규화
-	//FVector DirectionVector = (HitPoint - HitPawn->GetActorLocation()).GetSafeNormal();
+	FVector HitDirection = (HitPoint - HitPawn->GetActorLocation()).GetSafeNormal();
 
 
 	// 플레이어의 전방 벡터를 얻습니다.
 	FVector ForwardVector = HitPawn->GetActorForwardVector();
 
 
-	// 두 벡터 사이의 각도를 계산합니다. 결과는 라디안 단위입니다.
+	// 두 벡터 사이의 각도를 계산합니다.
 	float DotProduct = FVector::DotProduct(ForwardVector, HitDirection);
 	float AngleRadians = acos(DotProduct); // acos는 라디안 값을 반환합니다.
-
-
-	// 라디안을 도(degree)로 변환합니다.
-	float AngleDegrees = FMath::RadiansToDegrees(AngleRadians);
+	float AngleDegrees = FMath::RadiansToDegrees(AngleRadians); // 라디안을 도(degree)로 변환합니다.
 
 
 	// 피격 위치가 플레이어의 왼쪽 또는 오른쪽인지 결정합니다.
 	FVector CrossProduct = FVector::CrossProduct(ForwardVector, HitDirection);
-	UE_LOG(LogTemp, Warning, TEXT("CrossProduct : %s"), *CrossProduct.ToString());
 	if (CrossProduct.Z < 0)
 	{
 		AngleDegrees = 360 - AngleDegrees; // 오른쪽의 각도를 양의 값으로 조정
@@ -130,8 +124,7 @@ void AGun::PlayerHapticOnHit(APawn* HitPawn , FVector HitPoint)
 	// 반시계 방향으로 변환
 	float CounterClockwiseAngle = 360.0f - AngleDegrees;
 
-	// 그 결과로 햅틱을 울린다.
-	UE_LOG(LogTemp, Warning, TEXT("Hit angle: %f degrees"), AngleDegrees);
+	// 그 결과로 햅틱을 울린다. "hit"을 변수화 시켜서 사용하는 로직도 괜찮을지도?
 	UBhapticsSDK2::PlayHapticWithOption("hit", 1.0f, 1.0f, CounterClockwiseAngle, HitDirection.Z);
 }
 
